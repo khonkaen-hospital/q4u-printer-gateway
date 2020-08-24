@@ -215,9 +215,16 @@ function start() {
             var json = JSON.parse(message);
             var queue = json;
             if (queue) {
-              console.log(queue);
-              printQueue(queue);
-
+              const singleSlipSso = queue.singleSlipSso || 0;
+              if (singleSlipSso === 1) {
+                printSso(queue);
+              } else {
+                const slipSso = queue.slipSso || 0;
+                printQueue(queue);
+                if (slipSso === 1) {
+                  printSso(queue);
+                }
+              }
             } else {
               txtLogs.value += `\n${moment().format('HH:mm:ss')} - [ERROR] Queue not found.`;
               txtLogs.scrollTop = txtLogs.scrollHeight;
@@ -368,6 +375,86 @@ async function printQueue(queue) {
 
     } else {
       txtLogs.value += `\n${moment().format('HH:mm:ss')} - [PRINT] Queue number ${queueNumber} not found.`;
+      txtLogs.scrollTop = txtLogs.scrollHeight;
+    }
+
+  } catch (error) {
+    txtLogs.value += `\n${moment().format('HH:mm:ss')} - [PRINT] Error.`;
+    txtLogs.scrollTop = txtLogs.scrollHeight;
+    console.log(error);
+  }
+}
+
+async function printSso(queue) {
+  try {
+
+    const printerIp = localStorage.getItem('printerIp');
+    const device = new escpos.Network(printerIp);
+    const printer = new escpos.Printer(device);
+
+    if (queue) {
+      const hosname = queue.hosname;
+      const fullName = queue.fullName;
+      const rightName = queue.rightName;
+      const rightHospital = queue.rightHospital;
+      const rightStartDate = queue.rightStartDate;
+      const hn = queue.hn;
+
+      const dateTime = moment().locale('th').format('DD MMM YYYY HH:mm:ss');
+
+      device.open(function () {
+        printer
+          .model('qrprinter')
+          .align('ct')
+          .encode('tis620')
+          .size(2, 1)
+          .text(hosname)
+          .size(1, 1);
+
+        printer
+          .text('')
+          .style('u')
+          .text('HN')
+          .style('b')
+          .text(hn ? hn : 'ไม่พบข้อมูล CID');
+
+        printer
+          .text('')
+          .style('u')
+          .text('ชื่อ-นามสกุล')
+          .style('b')
+          .text(fullName)
+          .text('')
+          .style('u')
+          .text('สิทธิการรักษาพยาบาล')
+          .style('b')
+          .text(rightName)
+          .text('')
+          .style('u')
+          .text('วันที่เริ่มใช้สิทธิ์')
+          .style('b')
+          .text(rightStartDate)
+          .text('')
+          .style('u')
+          .text('หน่วยบริการหลัก')
+          .style('b')
+          .text(rightHospital)
+          .text('');
+
+        if (hn) {
+          printer.barcode(hn, 'CODE39', { height: 50, font: 'B' });
+        }
+
+        printer.text('')
+          .cut()
+          .close();
+      });
+
+      txtLogs.value += `\n${moment().format('HH:mm:ss')} - [PRINT] Success print.${fullName}`;
+      txtLogs.scrollTop = txtLogs.scrollHeight;
+
+    } else {
+      txtLogs.value += `\n${moment().format('HH:mm:ss')} - [PRINT] not found.`;
       txtLogs.scrollTop = txtLogs.scrollHeight;
     }
 
