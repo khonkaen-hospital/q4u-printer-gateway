@@ -333,6 +333,8 @@ async function printQueue(queue) {
             .size(1, 1)
             .text(firstName + ' ' + lastName)
             .text('')
+            .barcode(hn, 'CODE39', { height: 50, font: 'B' })
+            .text('')
             .cut()
         }
 
