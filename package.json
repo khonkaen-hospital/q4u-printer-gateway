@@ -1,7 +1,7 @@
 {
   "name": "printer-gateway",
   "productName": "printer-gateway",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Q4U - Printer Gateway",
   "main": "src/index.js",
   "scripts": {
