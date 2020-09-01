@@ -317,16 +317,16 @@ async function printQueue(queue) {
 
         if (printSmallQueue === 'Y') {
           printer
-            .size(2, 1)
+            .size(1, 1)
             .text(hosname)
             .text('')
             .text(servicePointName)
             .text('')
-            .size(1, 1)
-            .text('ลำดับที่')
-            .text('')
-            .size(3, 3)
+            .size(3, 1)
             .text(queueNumber)
+            .size(1, 1)
+            .text('')
+            .text(priorityName)
             .size(2, 1)
             .text('')
             .text('HN ' + hn)
@@ -339,13 +339,12 @@ async function printQueue(queue) {
         }
 
         printer
-          .size(2, 1)
+          .size(1, 1)
           .text(hosname)
+          .size(2, 1)
           .text(servicePointName)
-          .text('')
           .size(1, 1)
           .text('ลำดับที่')
-          .text('')
           .size(3, 3)
           .text(queueNumber)
           // .text('')
